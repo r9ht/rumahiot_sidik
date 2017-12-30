@@ -14,8 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # from django.contrib import admin
-from django.conf.urls import url, include
+from django.conf.urls import url
+from rumahiot_sidik.apps.authentication.views import email_authentication
 
 urlpatterns = [
-    url(r'^authenticate/', include('rumahiot_sidik.apps.authentication')),
+    url(r'^email/$', email_authentication,name='email_authentication' ),
 ]

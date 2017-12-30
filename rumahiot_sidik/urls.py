@@ -17,5 +17,5 @@ Including another URLconf
 from django.conf.urls import url, include
 
 urlpatterns = [
-    url(r'^authenticate/', include('rumahiot_sidik.apps.authentication')),
+    url(r'^authenticate/', include('rumahiot_sidik.apps.authentication.urls')),
 ]

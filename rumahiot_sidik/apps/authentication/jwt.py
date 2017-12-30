@@ -5,7 +5,7 @@ from datetime import datetime
 from datetime import timedelta
 
 # verify jwt token
-# param : token (string)
+# input parameter : token (string)
 # return : is_valid(boolean) , payload (dict) , error_message (string) -> if invalid
 # verified using the secret key , algorithm : HS256
 def token_verifier(token):
@@ -46,7 +46,6 @@ def token_verifier(token):
 def token_generator(uuid):
     # Expired time hardcoded in this function
     # Current : 15 Minutes from the time the code was generated
-
     # exp in float type (unix timestap)
     exp = datetime.now() + timedelta(minutes=15)
 
@@ -55,7 +54,6 @@ def token_generator(uuid):
         'exp' : exp.timestamp()
     }
     return jwt.encode(payload,os.environ.get('SIDIK_SECRET_KEY',''),algorithm='HS256')
-
 
 
 
