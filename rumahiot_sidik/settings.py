@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rumahiot_sidik.apps.authentication'
 ]
 
 MIDDLEWARE = [
