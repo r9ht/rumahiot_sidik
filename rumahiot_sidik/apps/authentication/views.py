@@ -4,12 +4,16 @@ from rumahiot_sidik.apps.authentication.utils import error_response_generator,da
 from rumahiot_sidik.apps.authentication.resources import EmailAuthenticationRequest
 from django.views.decorators.csrf import csrf_exempt
 import json
+from throttle.decorators import throttle
 
 
 # Create your views here.
 
 # authenticate using email address and password
+# max : 60 request every minute for the same ip address
+# TODO : Fix ElastiCache
 @csrf_exempt
+@throttle(zone='email_authentication')
 def email_authentication(request):
     if request.method != "POST":
         response_data = error_response_generator(400,"Bad request method")
