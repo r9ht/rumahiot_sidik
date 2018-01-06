@@ -1,10 +1,10 @@
 import boto3
-import json
-import decimal
-import hashlib,uuid
+from uuid import uuid4
+from datetime import datetime
 from rumahiot_sidik.apps.authentication.utils import password_hasher
 from rumahiot_sidik.apps.authentication.jwt import token_generator
 from boto3.dynamodb.conditions import Key, Attr
+import uuid
 
 # DynamoDB client
 def dynamodb_client():
@@ -39,7 +39,7 @@ def user_check_by_email(email,password):
         data['error_message'] = "Invalid email or password"
         return data
     else:
-        if user[0]['password'] != password_hasher(user[0]['uuid'],password):
+        if user[0]['password'] != password_hasher(user[0]['salt'],password):
             # if the password wasn't correct
             data['is_valid'] = False
             data['user'] = None
@@ -51,21 +51,58 @@ def user_check_by_email(email,password):
             data['error_message'] = None
             return data
 
-# put new JSON web token into DynamoDB
-def create_jwt_token(uuid):
-    token = token_generator(uuid)
+# put session and user uuid binding into DynamoDB and return jwt
+# input parameter : uuid(string) , session_key(string)
+# returning : token(string)
+def create_jwt_token(uuid,session_key):
+    # TODO : Check if deleting is cheaper than writing, or is it the same
+    token = token_generator(session_key)
     client = dynamodb_client()
-    table = client.Table('rumahiot_user_tokens')
-    # put the token
+    table = client.Table('rumahiot_sessions')
+    # put the token & user uuid in dynamodb
     item = {
-            'token' : token.decode("utf-8"),
+            'session_key' : session_key,
+            'uuid' : uuid,
+            'time_created' : str(datetime.now().timestamp())
         }
     response = table.put_item(
         Item=item
     )
+    item = {
+        'token': token.decode("utf-8"),
+    }
     return item
 
 
+# Create user and put the data in dynamodb
+# input parameter : email(string) , password(string)
+# returning : status(boolean)
+def create_user_by_email(email,password):
+    status = False
+    # for password salt
+    salt = uuid4().hex
+    # for user uuid
+    uuid = uuid4().hex
+    # password
+    hashed_password = password_hasher(salt,password)
+    # check for account existance
+    user = get_user_account_by_email(email)
+
+    if len(user) != 0:
+        status = False
+    else:
+        # dynamodb client
+        client = dynamodb_client()
+        table = client.Table('rumahiot_user')
+        response = table.put_item(
+            Item={
+                'email' : email,
+                'password' : hashed_password,
+                'uuid' : uuid
+            }
+        )
+        status = True
+    return status
 
 
 # # create new user using email address and passsword

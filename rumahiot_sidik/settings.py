@@ -118,27 +118,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Redis Caching for throttling
-# Using ElastiCache in AWS
-
-
-THROTTLE_ZONES = {
-    'email_authentication': {
-        'VARY':'throttle.zones.RemoteIP',
-        'NUM_BUCKETS':2,  # Number of buckets worth of history to keep. Must be at least 2
-        'BUCKET_INTERVAL':1 * 60,  # Period of time to enforce limits.
-        'BUCKET_CAPACITY':1,  # Maximum number of requests allowed within BUCKET_INTERVAL
-    },
-}
-
-# Where to store request counts.
-THROTTLE_BACKEND = 'throttle.backends.redispy.RedisBackend'
-
-# Optional after Redis backend is chosen ('throttle.backends.redispy.RedisBackend')
-THROTTLE_REDIS_HOST = os.environ.get('JANIL_AWS_REDIS','')
-THROTTLE_REDIS_PORT = 6379
-THROTTLE_REDIS_DB = 0
-
-# Force throttling when DEBUG=True
-THROTTLE_ENABLED = True

@@ -43,14 +43,14 @@ def token_verifier(token):
 # param : uuid(string)
 # return : token (string)
 # Encoded using the secret key , algorithm : HS256
-def token_generator(uuid):
+def token_generator(session_key):
     # Expired time hardcoded in this function
-    # Current : 15 Minutes from the time the code was generated
+    # Current : 1 hour from the time the code was generated
     # exp in float type (unix timestap)
-    exp = datetime.now() + timedelta(minutes=15)
+    exp = datetime.now() + timedelta(hours=1)
 
     payload = {
-        'uuid' : str(uuid),
+        'session' : str(session_key),
         'exp' : exp.timestamp()
     }
     return jwt.encode(payload,os.environ.get('SIDIK_SECRET_KEY',''),algorithm='HS256')
