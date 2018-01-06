@@ -93,7 +93,7 @@ def create_user_by_email(email,password):
     else:
         # dynamodb client
         client = dynamodb_client()
-        table = client.Table('rumahiot_user')
+        table = client.Table('rumahiot_users')
         response = table.put_item(
             Item={
                 'email' : email,
