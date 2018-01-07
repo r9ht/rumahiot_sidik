@@ -86,7 +86,7 @@ def email_registration(request):
                     create_success = create_user_by_email(form.cleaned_data['email'], form.cleaned_data['password'])
                     # If dynamodb returning unknown error
                     if create_success:
-                        response_data = success_response_generator("User successfully registered")
+                        response_data = success_response_generator(200,"User successfully registered")
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
                     else:
                         response_data = error_response_generator(400, "User already exist")
