@@ -98,7 +98,8 @@ def create_user_by_email(email,password):
             Item={
                 'email' : email,
                 'password' : hashed_password,
-                'uuid' : uuid
+                'uuid' : uuid,
+                'salt' : salt
             }
         )
         status = True

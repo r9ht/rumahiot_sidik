@@ -22,3 +22,12 @@ def data_response_generator(data):
         "data" : data
     }
     return response
+
+# generate error response in dict format
+def success_response_generator(message):
+    response = {
+        "success":{
+            "message" : message
+        }
+    }
+    return response

@@ -10,9 +10,13 @@ class EmailRegistrationForm(forms.Form):
     retype_password = forms.CharField(required=True, max_length=120)
 
     def clean(self):
-        if self.cleaned_data['password'] != self.cleaned_data['retype_password']:
-            # TODO : Please do backup validation in frontend
-            raise forms.ValidationError('Password Missmatch')
+        if 'password' in self.cleaned_data and 'retype_password' in self.cleaned_data:
+            if self.cleaned_data['password'] != self.cleaned_data['retype_password']:
+                # TODO : Please do backup validation in frontend & sent the error into the view
+                raise forms.ValidationError('Password Missmatch')
+            else:
+                return self.cleaned_data
         else:
-            return self.cleaned_data
+            raise forms.ValidationError('Invalid parameter')
+
 
