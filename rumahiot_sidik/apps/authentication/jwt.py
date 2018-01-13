@@ -50,7 +50,7 @@ def token_generator(session_key):
     exp = datetime.now() + timedelta(hours=1)
 
     payload = {
-        'session' : str(session_key),
+        'user_uuid' : str(session_key),
         'exp' : exp.timestamp()
     }
     return jwt.encode(payload,os.environ.get('SIDIK_SECRET_KEY',''),algorithm='HS256')

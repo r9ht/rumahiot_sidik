@@ -28,7 +28,7 @@ def get_user_account_by_email(email):
 # email authentication
 # input parameter : email(string) , password(string)
 # returning : is_valid(boolean) , data(dict) , error_message(string)
-def user_check_by_email(email,password):
+def user_get_by_email(email,password):
     # get the user
     data = {}
     user = get_user_account_by_email(email)

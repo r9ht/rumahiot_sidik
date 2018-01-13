@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse
 from rumahiot_sidik.apps.authentication.jwt import token_generator
 from rumahiot_sidik.apps.authentication.utils import error_response_generator,data_response_generator,success_response_generator
 from django.views.decorators.csrf import csrf_exempt
-from rumahiot_sidik.apps.authentication.dynamodb import user_check_by_email,create_user_by_email
+from rumahiot_sidik.apps.authentication.dynamodb import user_get_by_email,create_user_by_email
 import json,requests,os
 from rumahiot_sidik.apps.authentication.forms import EmailLoginForm,EmailRegistrationForm
 
@@ -41,7 +41,7 @@ def email_authentication(request):
         if form.is_valid():
             try:
                 # check user email and password
-                user = user_check_by_email(form.cleaned_data['email'],form.cleaned_data['password'])
+                user = user_get_by_email(form.cleaned_data['email'],form.cleaned_data['password'])
             except ImportError:
                 response_data = error_response_generator(500, "Internal server error")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
@@ -51,7 +51,7 @@ def email_authentication(request):
                     try:
                         # create the token
                         data = {
-                            "token" : str(token_generator(user['user']['user_uuid']))
+                            "token" : token_generator(user['user']['user_uuid']).decode('utf-8')
                         }
                     except:
                         response_data = error_response_generator(500, "Internal server error")
