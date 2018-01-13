@@ -1,8 +1,9 @@
 from django.shortcuts import render,HttpResponse
-from rumahiot_sidik.apps.authentication.dynamodb import user_check_by_email,create_jwt_token,create_user_by_email
+from rumahiot_sidik.apps.authentication.jwt import token_generator
 from rumahiot_sidik.apps.authentication.utils import error_response_generator,data_response_generator,success_response_generator
 from django.views.decorators.csrf import csrf_exempt
-import json,uuid,requests,os
+from rumahiot_sidik.apps.authentication.dynamodb import user_check_by_email,create_user_by_email
+import json,requests,os
 from rumahiot_sidik.apps.authentication.forms import EmailLoginForm,EmailRegistrationForm
 
 # functions
@@ -41,7 +42,7 @@ def email_authentication(request):
             try:
                 # check user email and password
                 user = user_check_by_email(form.cleaned_data['email'],form.cleaned_data['password'])
-            except:
+            except ImportError:
                 response_data = error_response_generator(500, "Internal server error")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
             else:
@@ -49,9 +50,9 @@ def email_authentication(request):
                 if user['is_valid']:
                     try:
                         # create the token
-                        # rand_feed -> random
-                        session_key = uuid.uuid4().hex
-                        data = create_jwt_token(user['user']['uuid'],session_key)
+                        data = {
+                            "token" : str(token_generator(user['user']['user_uuid']))
+                        }
                     except:
                         response_data = error_response_generator(500, "Internal server error")
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
@@ -73,7 +74,7 @@ def email_registration(request):
         response_data = error_response_generator(400, "Bad request method")
         return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
     else:
-        # TODO : Generate error response for rumah iot
+        # TODO : Generate error response for rumah iot & error response api for rumah IoT
         try:
             form = EmailRegistrationForm(request.POST)
         except KeyError:
@@ -83,7 +84,7 @@ def email_registration(request):
             is_recaptcha_valid = recaptcha_verify(request.POST.get("g-recaptcha-response", ""))
             if form.is_valid():
                 if is_recaptcha_valid:
-                    create_success = create_user_by_email(form.cleaned_data['email'], form.cleaned_data['password'])
+                    create_success = create_user_by_email(form.cleaned_data['full_name'],form.cleaned_data['email'], form.cleaned_data['password'])
                     # If dynamodb returning unknown error
                     if create_success:
                         response_data = success_response_generator(200,"User successfully registered")
@@ -97,13 +98,8 @@ def email_registration(request):
                     return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
 
             else:
-                form_error = ""
-                for e in form.errors['__all__'].as_data():
-                    for err in e:
-                        form_error = err
-                # if the request parameter isn't complete
                 # Todo : push the error from form to here , change the error type
-                response_data = error_response_generator(400,form_error)
+                response_data = error_response_generator(400,"Missmatch password or invalid parameter submitted")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
 
 

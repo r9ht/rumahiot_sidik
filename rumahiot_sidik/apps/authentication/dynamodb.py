@@ -51,33 +51,11 @@ def user_check_by_email(email,password):
             data['error_message'] = None
             return data
 
-# put session and user uuid binding into DynamoDB and return jwt
-# input parameter : uuid(string) , session_key(string)
-# returning : token(string)
-def create_jwt_token(uuid,session_key):
-    # TODO : Check if deleting is cheaper than writing, or is it the same
-    token = token_generator(session_key)
-    client = dynamodb_client()
-    table = client.Table('rumahiot_sessions')
-    # put the token & user uuid in dynamodb
-    item = {
-            'session_key' : session_key,
-            'uuid' : uuid,
-            'time_created' : str(datetime.now().timestamp())
-        }
-    response = table.put_item(
-        Item=item
-    )
-    item = {
-        'token': token.decode("utf-8"),
-    }
-    return item
-
 
 # Create user and put the data in dynamodb
 # input parameter : email(string) , password(string)
 # returning : status(boolean)
-def create_user_by_email(email,password):
+def create_user_by_email(full_name,email,password):
     status = False
     # for password salt
     salt = uuid4().hex
@@ -98,8 +76,8 @@ def create_user_by_email(email,password):
             Item={
                 'email' : email,
                 'password' : hashed_password,
-                'uuid' : uuid,
-                'salt' : salt
+                'user_uuid' : uuid,
+                'salt' : salt,
             }
         )
         status = True
