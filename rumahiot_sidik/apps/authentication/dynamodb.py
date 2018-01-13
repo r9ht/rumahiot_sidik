@@ -1,14 +1,12 @@
 import boto3
 from uuid import uuid4
-from datetime import datetime
 from rumahiot_sidik.apps.authentication.utils import password_hasher
-from rumahiot_sidik.apps.authentication.jwt import token_generator
-from boto3.dynamodb.conditions import Key, Attr
-import uuid
+from boto3.dynamodb.conditions import Key
+from rumahiot_sidik.settings import RUMAHIOT_USERS_TABLE,RUMAHIOT_REGION,RUMAHIOT_USERS_PROFILE_TABLE
 
 # DynamoDB client
 def dynamodb_client():
-    client = boto3.resource('dynamodb', region_name='ap-southeast-1')
+    client = boto3.resource('dynamodb', region_name=RUMAHIOT_REGION)
     return client
 
 # get user account by email
@@ -16,7 +14,7 @@ def dynamodb_client():
 # return user [dict]
 def get_user_account_by_email(email):
     client = dynamodb_client()
-    table = client.Table('rumahiot_users')
+    table = client.Table(RUMAHIOT_USERS_TABLE)
     # get user account
     response = table.scan(
         FilterExpression=Key('email').eq(email),
@@ -71,7 +69,7 @@ def create_user_by_email(full_name,email,password):
     else:
         # dynamodb client
         client = dynamodb_client()
-        table = client.Table('rumahiot_users')
+        table = client.Table(RUMAHIOT_USERS_TABLE)
         response = table.put_item(
             Item={
                 'email' : email,
@@ -80,22 +78,12 @@ def create_user_by_email(full_name,email,password):
                 'salt' : salt,
             }
         )
-        status = True
+        # status = True
+        # Put profile data
+        table = client.Table(RUMAHIOT_USERS_PROFILE_TABLE)
+        response = table.put_item(
+            Item={
+                'user_uuid' : uuid,
+            }
+        )
     return status
-
-
-# # create new user using email address and passsword
-# def create_user_by_email(email,password):
-#     # salt will be used as table uuid
-#     salt = uuid.uuid4().hex
-#     hashed_password = password_hasher(salt,password)
-#     # dynamodb client
-#     client = dynamodb_client()
-#     table = client.Table('rumahiot_user')
-#     response = table.put_item(
-#         Item = {
-#         'uuid' : salt,
-#         'email' : email,
-#         'password' : hashed_password
-#     }
-#     )

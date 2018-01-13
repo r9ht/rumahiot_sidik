@@ -118,3 +118,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# RUMAH IOT CONFIG
+DEFAULT_PROFILE_IMAGE_URL = "https://s3-ap-southeast-1.amazonaws.com/rumahiot-static/images/profile/default-profile-picture.png"
+RUMAHIOT_USERS_TABLE = 'rumahiot_users'
+RUMAHIOT_USERS_PROFILE_TABLE = 'rumahiot_users_profile'
+RUMAHIOT_REGION = 'ap-southeast-1'
