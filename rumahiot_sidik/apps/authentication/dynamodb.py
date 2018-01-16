@@ -86,7 +86,7 @@ def create_user_by_email(full_name,email,password):
                 'user_uuid' : uuid,
                 'full_name' : full_name,
                 'profile_image' : DEFAULT_PROFILE_IMAGE_URL,
-                'phone_number' : '',
+                'phone_number' : '-',
 
             }
         )

@@ -85,14 +85,19 @@ def email_registration(request):
             is_recaptcha_valid = recaptcha_verify(request.POST.get("g-recaptcha-response", ""))
             if form.is_valid():
                 if is_recaptcha_valid:
-                    create_success = create_user_by_email(form.cleaned_data['full_name'],form.cleaned_data['email'], form.cleaned_data['password'])
-                    # If dynamodb returning unknown error
-                    if create_success:
-                        response_data = success_response_generator(200,"User successfully registered")
-                        return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
-                    else:
-                        response_data = error_response_generator(400, "User already exist")
+                    try:
+                        create_success = create_user_by_email(form.cleaned_data['full_name'],form.cleaned_data['email'], form.cleaned_data['password'])
+                    except:
+                        # unknown client error
+                        response_data = error_response_generator(500, "Internal server error")
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
+                    else:
+                        if create_success:
+                            response_data = success_response_generator(200, "User successfully registered")
+                            return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+                        else:
+                            response_data = error_response_generator(400, "User already exist")
+                            return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
                 else:
                     # if the recaptcha isn't valid
                     response_data = error_response_generator(400, "Please complete the Recaptcha")
