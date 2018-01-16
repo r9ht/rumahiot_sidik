@@ -2,7 +2,7 @@ import boto3
 from uuid import uuid4
 from rumahiot_sidik.apps.authentication.utils import password_hasher
 from boto3.dynamodb.conditions import Key
-from rumahiot_sidik.settings import RUMAHIOT_USERS_TABLE,RUMAHIOT_REGION,RUMAHIOT_USERS_PROFILE_TABLE
+from rumahiot_sidik.settings import RUMAHIOT_USERS_TABLE,RUMAHIOT_REGION,RUMAHIOT_USERS_PROFILE_TABLE,DEFAULT_PROFILE_IMAGE_URL
 
 # DynamoDB client
 def dynamodb_client():
@@ -78,12 +78,15 @@ def create_user_by_email(full_name,email,password):
                 'salt' : salt,
             }
         )
-        # status = True
+
         # Put profile data
         table = client.Table(RUMAHIOT_USERS_PROFILE_TABLE)
         response = table.put_item(
             Item={
                 'user_uuid' : uuid,
+                'full_name' : full_name,
+                'profile_image' : DEFAULT_PROFILE_IMAGE_URL
             }
         )
+        status = True
     return status
