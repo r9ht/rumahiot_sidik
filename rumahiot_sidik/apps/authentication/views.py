@@ -31,6 +31,7 @@ def recaptcha_verify(captcha_response):
 # Create your views here.
 
 # authenticate using email address and password
+# todo : implement refresh token
 @csrf_exempt
 def email_authentication(request):
     if request.method != "POST":
