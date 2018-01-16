@@ -120,10 +120,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-# RUMAH IOT CONFIG
+# RUMAH IOT SIDIK CONFIG
 DEFAULT_PROFILE_IMAGE_URL = "https://s3-ap-southeast-1.amazonaws.com/rumahiot-static/images/profile/default-profile-picture.png"
 RUMAHIOT_USERS_TABLE = 'rumahiot_users'
 RUMAHIOT_USERS_PROFILE_TABLE = 'rumahiot_users_profile'
 RUMAHIOT_REGION = 'ap-southeast-1'
 
 # TODO :  KEY FOR SIGNING JWT GENERATED AUTOMATICALLY EVERY 1 HOUR
+

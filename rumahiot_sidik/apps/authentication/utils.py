@@ -1,6 +1,6 @@
-import hashlib,uuid
+import hashlib
 
-# return salt(string),hashed_password(string)
+# return : salt(string),hashed_password(string)
 # salt will be used as uuid in the user table
 def password_hasher(salt,password):
     return hashlib.sha512(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()

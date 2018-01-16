@@ -14,9 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # from django.contrib import admin
-from django.conf.urls import url, include
+from django.conf.urls import url
+from rumahiot_sidik.apps.authorization.views import token_validation
 
 urlpatterns = [
-    url(r'^authenticate/', include('rumahiot_sidik.apps.authentication.urls')),
-    url(r'^authorize/', include('rumahiot_sidik.apps.authorization.urls')),
+    url(r'^token/validate$', token_validation,name='token_validation' ),
 ]

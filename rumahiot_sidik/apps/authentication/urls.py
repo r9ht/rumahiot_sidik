@@ -15,10 +15,9 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.conf.urls import url
-from rumahiot_sidik.apps.authentication.views import email_authentication,email_registration,token_validation
+from rumahiot_sidik.apps.authentication.views import email_authentication,email_registration
 
 urlpatterns = [
-    url(r'^email/$', email_authentication,name='email_authentication' ),
+    url(r'^email$', email_authentication,name='email_authentication' ),
     url(r'^email/register$', email_registration,name='email_registration' ),
-    url(r'^token/validate$', token_validation,name='token_validation' ),
 ]

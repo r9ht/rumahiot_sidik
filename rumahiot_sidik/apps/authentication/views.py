@@ -1,5 +1,5 @@
 from django.shortcuts import render,HttpResponse
-from rumahiot_sidik.apps.authentication.jwt import token_generator,token_validator
+from rumahiot_sidik.apps.authentication.jwt import token_generator
 from rumahiot_sidik.apps.authentication.utils import error_response_generator,data_response_generator,success_response_generator
 from django.views.decorators.csrf import csrf_exempt
 from rumahiot_sidik.apps.authentication.dynamodb import user_get_by_email,create_user_by_email
@@ -101,47 +101,6 @@ def email_registration(request):
                 # Todo : push the error from form to here , change the error type
                 response_data = error_response_generator(400,"Missmatch password or invalid parameter submitted")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
-
-#
-# @csrf_exempt
-# def token_validation(request):
-#     print(request.META['HTTP_AUTHORIZATION'])
-#
-#
-#
-
-@csrf_exempt
-def token_validation(request):
-    if request.method != "POST":
-        response_data = error_response_generator(400, 'Invalid request method')
-        return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
-    else:
-        try:
-            form = TokenValidationForm(request.POST)
-        except KeyError:
-            response_data = error_response_generator(500, "Internal server error")
-            return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
-        else:
-            if form.is_valid():
-                # try to get the payload
-                response = token_validator(form.cleaned_data['token'])
-                if response['error'] != None:
-                    response_data = error_response_generator(400, response['error'])
-                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
-                else:
-                    data = {
-                        'token' : form.cleaned_data['token'],
-                        'payload' : response['payload']
-                    }
-                    response_data = data_response_generator(data)
-                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
-
-            else:
-                response_data = error_response_generator(400, "invalid parameter submitted")
-                return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
-
-
-
 
 
 
