@@ -34,7 +34,7 @@ def token_validation(request):
                     return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
 
             else:
-                response_data = error_response_generator(400, "invalid parameter submitted")
+                response_data = error_response_generator(400, "invalid or missing parameter submitted")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
 
 

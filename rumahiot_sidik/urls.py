@@ -20,3 +20,6 @@ urlpatterns = [
     url(r'^authenticate/', include('rumahiot_sidik.apps.authentication.urls')),
     url(r'^authorize/', include('rumahiot_sidik.apps.authorization.urls')),
 ]
+
+
+

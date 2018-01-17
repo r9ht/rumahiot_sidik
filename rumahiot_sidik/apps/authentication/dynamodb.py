@@ -81,13 +81,13 @@ def create_user_by_email(full_name,email,password):
 
         # Put profile data
         table = client.Table(RUMAHIOT_USERS_PROFILE_TABLE)
+        # define all profile field here , use '-' as business logic for none
         response = table.put_item(
             Item={
                 'user_uuid' : uuid,
                 'full_name' : full_name,
                 'profile_image' : DEFAULT_PROFILE_IMAGE_URL,
-                'phone_number' : '-',
-
+                'phone_number' : '-'
             }
         )
         status = True
