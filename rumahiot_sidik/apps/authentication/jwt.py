@@ -13,7 +13,7 @@ def token_generator(user_uuid):
     # Expired time hardcoded in this function
     # Current : 15 minute from the time the code was generated
     # exp in float type (unix timestap)
-    exp = datetime.now() + timedelta(minutes=15)
+    exp = datetime.now() + timedelta(minutes=24)
 
     payload = {
         'user_uuid' : str(user_uuid),

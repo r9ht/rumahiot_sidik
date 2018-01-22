@@ -1,14 +1,14 @@
 from django import forms
 
 class EmailLoginForm(forms.Form):
-    email = forms.EmailField(required=True,max_length=120)
-    password = forms.CharField(required=True,max_length=120)
+    email = forms.EmailField(required=True,max_length=254)
+    password = forms.CharField(required=True,max_length=32)
 
 class EmailRegistrationForm(forms.Form):
-    full_name = forms.CharField(required=True,max_length=120)
-    email = forms.EmailField(required=True,max_length=120)
-    password = forms.CharField(required=True,max_length=120)
-    retype_password = forms.CharField(required=True, max_length=120)
+    full_name = forms.CharField(required=True,max_length=70)
+    email = forms.EmailField(required=True,max_length=254)
+    password = forms.CharField(required=True,max_length=50)
+    retype_password = forms.CharField(required=True, max_length=50)
 
     def clean(self):
         if 'password' in self.cleaned_data and 'retype_password' in self.cleaned_data and 'full_name' in self.cleaned_data:
