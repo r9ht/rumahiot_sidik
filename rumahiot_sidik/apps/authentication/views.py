@@ -82,6 +82,7 @@ def email_registration(request):
             response_data = error_response_generator(500, "Internal server error")
             return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
         else:
+            # is_recaptcha_valid = recaptcha_verify(request.POST.get("g_recaptcha_response", "")) g-recaptcha-response
             is_recaptcha_valid = recaptcha_verify(request.POST.get("g-recaptcha-response", ""))
             if form.is_valid():
                 if is_recaptcha_valid:

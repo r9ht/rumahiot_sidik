@@ -35,10 +35,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rumahiot_sidik.apps.authentication'
+    'rumahiot_sidik.apps.authentication',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -128,3 +130,5 @@ RUMAHIOT_REGION = 'ap-southeast-1'
 
 # TODO :  GENERATE NEW KEY FOR JWT SIGNING EVERY ONE HOUR
 
+# TODO : Limit from one domain only
+CORS_ORIGIN_ALLOW_ALL = True

@@ -38,5 +38,6 @@ def token_validation(request):
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
 
 
+# todo : secure the mongo & redis instance with adding ip address source range
 
 
