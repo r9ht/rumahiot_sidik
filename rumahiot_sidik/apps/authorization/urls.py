@@ -19,4 +19,9 @@ from rumahiot_sidik.apps.authorization.views import token_validation
 
 urlpatterns = [
     url(r'^token/validate$', token_validation,name='token_validation' ),
+    url(r'^writekey/validate$', token_validation,name='writekey_validation' ),
+    url(r'^readkey/validate$', token_validation,name='readkey_validation' ),
+    url(r'^writekey/refresh$', token_validation,name='refresh_writekey' ),
+    url(r'^readkey/refresh$', token_validation,name='refresh_readkey' ),
+
 ]
