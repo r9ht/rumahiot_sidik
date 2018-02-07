@@ -122,13 +122,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+#todo : move every config into env
 # RUMAH IOT SIDIK CONFIG
 DEFAULT_PROFILE_IMAGE_URL = "https://s3-ap-southeast-1.amazonaws.com/rumahiot-static/images/profile/default-profile-picture.png"
 RUMAHIOT_USERS_TABLE = 'rumahiot_users'
 RUMAHIOT_USERS_PROFILE_TABLE = 'rumahiot_users_profile'
 RUMAHIOT_REGION = 'ap-southeast-1'
+RUMAHIOT_DEVICE_TABLE = 'rumahiot_users_device'
 
 # TODO :  GENERATE NEW KEY FOR JWT SIGNING EVERY ONE HOUR
 
+# CORS Header
 # TODO : Limit from one domain only
 CORS_ORIGIN_ALLOW_ALL = True

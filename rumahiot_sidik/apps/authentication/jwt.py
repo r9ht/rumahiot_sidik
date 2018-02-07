@@ -34,11 +34,11 @@ class SidikJWT():
             return data
         except exceptions.DecodeError:
             data['payload'] = None
-            data['error'] = 'Invalid signature'
+            data['error'] = 'Invalid JWT signature'
             return data
         except exceptions.InvalidAlgorithmError:
             data['payload'] = None
-            data['error'] = 'Invalid algorithm spesified'
+            data['error'] = 'Invalid JWT algorithm spesified'
             return data
         except exceptions.ExpiredSignatureError:
             data['payload'] = None

@@ -28,7 +28,7 @@ def email_authentication(request):
         if form.is_valid():
             try:
                 # check user email and password
-                user = db.user_get_by_email(form.cleaned_data['email'],form.cleaned_data['password'])
+                user = db.check_user(form.cleaned_data['email'],form.cleaned_data['password'])
             except ImportError:
                 response_data = rg.error_response_generator(500, "Internal server error")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
