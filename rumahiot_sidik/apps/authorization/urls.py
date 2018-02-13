@@ -18,8 +18,8 @@ from django.conf.urls import url
 from rumahiot_sidik.apps.authorization.views import token_validation,device_key_validation,device_key_refresh
 
 urlpatterns = [
-    url(r'^token/validate$', token_validation,name='token_validation' ),
-    url(r'^devicekey/validate$', device_key_validation,name='device_key_validation' ),
-    url(r'^devicekey/refresh$', device_key_refresh,name='device_key_refresh' ),
+    url(r'^token/validate$', token_validation,name='token_validation'),
+    url(r'^devicekey/validate$', device_key_validation,name='device_key_validation'),
+    url(r'^devicekey/refresh$', device_key_refresh,name='device_key_refresh'),
 
 ]

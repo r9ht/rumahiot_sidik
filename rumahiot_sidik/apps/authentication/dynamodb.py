@@ -24,6 +24,19 @@ class SidikDynamoDB():
         # return [uuid(string), email(string), password(string), last_login (string) -> utc timestamp] or [] if theres not match
         return response['Items']
 
+    # get user account by user_uuid
+    # input parameter : user_uuid(string)
+    # return user [dict]
+    def get_user_by_user_uuid(self,user_uuid):
+        table = self.client.Table(RUMAHIOT_USERS_TABLE)
+        # get user account
+        response = table.scan(
+            FilterExpression=Key('user_uuid').eq(user_uuid),
+        )
+        # please take the first element , (its shouldn't be possible though , just in case)
+        # return [uuid(string), email(string), password(string), last_login (string) -> utc timestamp] or [] if theres not match
+        return response['Items']
+
     # email authentication
     # input parameter : email(string) , password(string)
     # return : is_valid(boolean) , data(dict) , error_message(string)
