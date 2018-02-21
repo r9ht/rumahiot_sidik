@@ -124,11 +124,10 @@ STATIC_URL = '/static/'
 
 #todo : move every config into env
 # RUMAH IOT SIDIK CONFIG
-DEFAULT_PROFILE_IMAGE_URL = "https://s3-ap-southeast-1.amazonaws.com/rumahiot-static/images/profile/default-profile-picture.png"
-RUMAHIOT_USERS_TABLE = 'rumahiot_users'
-RUMAHIOT_USERS_PROFILE_TABLE = 'rumahiot_users_profile'
-RUMAHIOT_REGION = 'ap-southeast-1'
-RUMAHIOT_DEVICE_TABLE = 'rumahiot_users_device'
+DEFAULT_PROFILE_IMAGE_URL = os.environ.get('DEFAULT_PROFILE_IMAGE_URL','')
+RUMAHIOT_USERS_TABLE = os.environ.get('RUMAHIOT_USERS_TABLE','')
+RUMAHIOT_USERS_PROFILE_TABLE = os.environ.get('RUMAHIOT_USERS_PROFILE_TABLE','')
+RUMAHIOT_REGION = os.environ.get('RUMAHIOT_REGION','')
 
 # TODO :  GENERATE NEW KEY FOR JWT SIGNING EVERY ONE HOUR
 

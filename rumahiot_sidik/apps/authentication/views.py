@@ -86,10 +86,10 @@ def email_registration(request):
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
                     else:
                         if create_success:
-                            response_data = rg.success_response_generator(200, "User successfully registered")
+                            response_data = rg.success_response_generator(200, "Successfully registered please check your email for email confirmation")
                             return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
                         else:
-                            response_data = rg.error_response_generator(400, "User already exist")
+                            response_data = rg.error_response_generator(400, "Email already registered, please try another email")
                             return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
                 else:
                     # if the recaptcha isn't valid
