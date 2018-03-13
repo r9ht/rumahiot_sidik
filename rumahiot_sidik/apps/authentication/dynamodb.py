@@ -36,6 +36,19 @@ class SidikDynamoDB():
         # please take the first element , (its shouldn't be possible though , just in case)
         # return [uuid(string), email(string), password(string), last_login (string) -> utc timestamp] or [] if theres not match
         return response['Items']
+        # get user account by user_uuid
+        # input parameter : user_uuid(string)
+        # return user [dict]
+
+    def get_user_by_activation_uuid(self, activation_uuid):
+        table = self.client.Table(RUMAHIOT_USERS_TABLE)
+        # get user account
+        response = table.scan(
+            FilterExpression=Key('activation_uuid').eq(activation_uuid),
+        )
+        # please take the first element , (its shouldn't be possible though , just in case)
+        # return [uuid(string), email(string), password(string), last_login (string) -> utc timestamp] or [] if theres not match
+        return response['Items']
 
     # email authentication
     # input parameter : email(string) , password(string)
@@ -50,6 +63,7 @@ class SidikDynamoDB():
             data['user'] = None
             data['error_message'] = "Invalid email or password"
             return data
+
         else:
             utils = SidikUtils()
             if user[0]['password'] != utils.password_hasher(user[0]['salt'], password):
@@ -58,6 +72,11 @@ class SidikDynamoDB():
                 data['user'] = None
                 data['error_message'] = "Invalid email or password"
                 return data
+            elif user[0]['activated'] != True:
+                data['is_valid'] = False
+                data['user'] = None
+                data['error_message'] = "Please activate your account"
+                return data
             else:
                 data['is_valid'] = True
                 data['user'] = user[0]
@@ -65,10 +84,10 @@ class SidikDynamoDB():
                 return data
 
     # Create user and put the data in dynamodb
-    # input parameter : email(string) , password(string)
+    # input parameter : email(string) , password(string), activation_uuid(string)
     # return : status(boolean)
     # todo check aws timezone
-    def create_user_by_email(self,full_name, email, password):
+    def create_user_by_email(self,full_name, email, password, activation_uuid):
         utils = SidikUtils()
         status = False
         # for password salt
@@ -91,6 +110,8 @@ class SidikDynamoDB():
                     'password': hashed_password,
                     'user_uuid': uuid,
                     'salt': salt,
+                    'activation_uuid': activation_uuid,
+                    'activated': False,
                     'time_created': str(datetime.now().timestamp())
                 }
             )
@@ -103,9 +124,41 @@ class SidikDynamoDB():
                     'user_uuid': uuid,
                     'full_name': full_name,
                     'profile_image': DEFAULT_PROFILE_IMAGE_URL,
-                    'phone_number': '-',
+                    'phone_number': '0000000',
                     'time_updated': str(datetime.now().timestamp())
                 }
             )
             status = True
         return status
+
+    def activate_user_account(self, user_uuid):
+        # keep the error from breaking service by catching the client error in the view
+        table = self.client.Table(RUMAHIOT_USERS_TABLE)
+        response = table.update_item(
+            Key={
+                'user_uuid': user_uuid
+            },
+            UpdateExpression="set activated=:a",
+            ExpressionAttributeValues={
+                ':a': True,
+            },
+            ReturnValues="UPDATED_NEW"
+        )
+
+    def change_user_password(self, user_uuid, new_password):
+        # keep the error from breaking service by catching the client error in the view
+        new_salt = uuid4().hex
+        utils = SidikUtils()
+        table = self.client.Table(RUMAHIOT_USERS_TABLE)
+        response = table.update_item(
+            Key={
+                'user_uuid': user_uuid
+            },
+            UpdateExpression="set salt=:s, password=:p",
+            ExpressionAttributeValues={
+                ':s': new_salt,
+                ':p': utils.password_hasher(salt=new_salt,password=new_password)
+            },
+            ReturnValues="UPDATED_NEW"
+        )
+

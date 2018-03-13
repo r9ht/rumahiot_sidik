@@ -1,5 +1,5 @@
 from django import forms
-
+from django.utils.translation import ugettext_lazy as _
 
 # todo : check all of the max_length
 class TokenValidationForm(forms.Form):
@@ -12,7 +12,7 @@ class TokenValidationForm(forms.Form):
             if self.cleaned_data['email'] == "1" or self.cleaned_data['email'] == "0":
                 return self.cleaned_data
             else:
-                raise forms.ValidationError('Invalid parameter')
+                raise forms.ValidationError(_('Invalid parameter'))
 
 class DeviceKeyValidationForm(forms.Form):
     device_key = forms.CharField(required=True,max_length=500)
@@ -22,3 +22,15 @@ class DeviceKeyValidationForm(forms.Form):
 class DeviceKeyRefreshForm(forms.Form):
     device_uuid = forms.CharField(required=True,max_length=500)
 
+
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(required=True, max_length=128)
+    new_password = forms.CharField(required=True, max_length=128)
+    new_password_retype = forms.CharField(required=True, max_length=128)
+
+    def clean(self):
+        if 'new_password' in self.cleaned_data and 'new_password_retype' in self.cleaned_data:
+            if self.cleaned_data['new_password'] != self.cleaned_data['new_password_retype']:
+                raise forms.ValidationError(_('Password missmatch'))
+            else:
+                return self.cleaned_data

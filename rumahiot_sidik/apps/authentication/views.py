@@ -4,9 +4,9 @@ from rumahiot_sidik.apps.authentication.utils import SidikUtils, ResponseGenerat
 from django.views.decorators.csrf import csrf_exempt
 from rumahiot_sidik.apps.authentication.dynamodb import SidikDynamoDB
 import json,requests,os
+from uuid import uuid4
 from rumahiot_sidik.apps.authentication.forms import EmailLoginForm,EmailRegistrationForm
-
-
+from rumahiot_sidik.apps.surat_modules.send_email import SidikSuratModule
 # Create your views here.
 
 # authenticate using email address and password
@@ -62,6 +62,7 @@ def email_registration(request):
     db = SidikDynamoDB()
     utils = SidikUtils()
     rg = ResponseGenerator()
+    sm = SidikSuratModule()
 
     if request.method != 'POST' :
         response_data = rg.error_response_generator(400, 'Invalid request method')
@@ -78,16 +79,31 @@ def email_registration(request):
             is_recaptcha_valid = utils.recaptcha_verify(request.POST.get("g-recaptcha-response", ""))
             if form.is_valid():
                 if is_recaptcha_valid:
+                    activation_uuid = uuid4().hex
                     try:
-                        create_success = db.create_user_by_email(form.cleaned_data['full_name'],form.cleaned_data['email'], form.cleaned_data['password'])
+                        create_success = db.create_user_by_email(full_name=form.cleaned_data['full_name'],
+                                                                 email=form.cleaned_data['email'],
+                                                                 password=form.cleaned_data['password'],
+                                                                 activation_uuid=activation_uuid)
                     except:
                         # unknown client error
                         response_data = rg.error_response_generator(500, "Internal server error")
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
                     else:
                         if create_success:
-                            response_data = rg.success_response_generator(200, "Successfully registered please check your email for email confirmation")
-                            return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+                            # Send confirmation email
+                            response = sm.send_activation_email(email=form.cleaned_data['email'],
+                                                                  activation_uuid=activation_uuid)
+                            if response.status_code == 200:
+                                response_data = rg.success_response_generator(200,
+                                                                              "Successfully registered please check your email for confirmation")
+                                return HttpResponse(json.dumps(response_data), content_type="application/json",
+                                                    status=200)
+                            else:
+                                # unknown client error
+                                response_data = rg.error_response_generator(500, "Internal server error")
+                                return HttpResponse(json.dumps(response_data), content_type="application/json",
+                                                    status=500)
                         else:
                             response_data = rg.error_response_generator(400, "Email already registered, please try another email")
                             return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)

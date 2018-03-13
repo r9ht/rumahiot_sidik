@@ -15,9 +15,11 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.conf.urls import url
-from rumahiot_sidik.apps.authorization.views import token_validation,device_key_validation,device_key_refresh
+from rumahiot_sidik.apps.authorization.views import token_validation, email_activation, change_password
 
 urlpatterns = [
     url(r'^token/validate$', token_validation,name='token_validation'),
+    url(r'^email/activate/(?P<activation_uuid>.+)$', email_activation,name='email_activation'),
+    url(r'^password/change$', change_password,name='change_password'),
 
 ]
