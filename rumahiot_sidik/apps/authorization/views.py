@@ -1,11 +1,14 @@
-from django.shortcuts import render,HttpResponse
-from rumahiot_sidik.apps.authentication.jwt import SidikJWT
-from rumahiot_sidik.apps.authentication.dynamodb import SidikDynamoDB
-from rumahiot_sidik.apps.authentication.utils import SidikUtils,ResponseGenerator, RequestUtils
-from django.views.decorators.csrf import csrf_exempt
 import json
-from rumahiot_sidik.apps.authorization.forms import TokenValidationForm,ChangePasswordForm
+
+from django.shortcuts import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from rumahiot_sidik.apps.authentication.dynamodb import SidikDynamoDB
+from rumahiot_sidik.apps.authentication.jwt import SidikJWT
+from rumahiot_sidik.apps.authentication.utils import SidikUtils, ResponseGenerator, RequestUtils
+from rumahiot_sidik.apps.authorization.forms import TokenValidationForm, ChangePasswordForm
 from rumahiot_sidik.apps.surat_modules.send_email import SidikSuratModule
+
 
 # Create your views here.
 # Todo : Protect this endpoint with key
@@ -13,7 +16,6 @@ from rumahiot_sidik.apps.surat_modules.send_email import SidikSuratModule
 # Validate token that sent , returning user_uuid and other data based on the request
 @csrf_exempt
 def token_validation(request):
-
     # Sidik classes
     jwt = SidikJWT()
     rg = ResponseGenerator()
@@ -35,7 +37,7 @@ def token_validation(request):
                 result = jwt.token_validator(form.cleaned_data['token'])
                 if result['error'] != None:
                     response_data = rg.error_response_generator(400, result['error'])
-                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
+                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
                 else:
 
                     # If email address requested
@@ -53,13 +55,13 @@ def token_validation(request):
                 response_data = rg.error_response_generator(400, "invalid or missing parameter submitted")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
 
+
 @csrf_exempt
 def email_activation(request, activation_uuid):
     # Sidik classes
     rg = ResponseGenerator()
     db = SidikDynamoDB()
     sm = SidikSuratModule()
-
 
     if request.method == 'GET':
         user = db.get_user_by_activation_uuid(activation_uuid=activation_uuid)
@@ -109,7 +111,6 @@ def change_password(request):
     requtils = RequestUtils()
     jwt = SidikJWT()
 
-
     if request.method == "POST":
         try:
             token = requtils.get_access_token(request)
@@ -125,11 +126,13 @@ def change_password(request):
                         user = db.get_user_by_user_uuid(data['payload']['user_uuid'])
                         # check for unknown error
                         if len(user) != 0:
-                            hashed_old_password = su.password_hasher(salt=user[0]['salt'],password=form.cleaned_data['old_password'])
+                            hashed_old_password = su.password_hasher(salt=user[0]['salt'],
+                                                                     password=form.cleaned_data['old_password'])
                             # Check if the old password match
                             if hashed_old_password == user[0]['password']:
                                 try:
-                                    db.change_user_password(user_uuid=user[0]['user_uuid'],new_password=form.cleaned_data['new_password'])
+                                    db.change_user_password(user_uuid=user[0]['user_uuid'],
+                                                            new_password=form.cleaned_data['new_password'])
                                 except:
                                     # Catch unknown client error
                                     # unknown client error
@@ -153,7 +156,8 @@ def change_password(request):
                                                 status=500)
                     else:
                         # Todo : push the error from form to here , change the error type
-                        response_data = rg.error_response_generator(400,"Missmatch password or invalid parameter submitted")
+                        response_data = rg.error_response_generator(400,
+                                                                    "Missmatch password or invalid parameter submitted")
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
                 else:
                     response_data = rg.error_response_generator(400, data['error'])
@@ -165,9 +169,6 @@ def change_password(request):
     else:
         response_data = rg.error_response_generator(400, "Bad request method")
         return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
-
-
-
 
 # @csrf_exempt
 # def device_key_validation(request):
@@ -318,4 +319,3 @@ def change_password(request):
 #
 #
 #
-

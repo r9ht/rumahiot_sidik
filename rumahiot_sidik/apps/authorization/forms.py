@@ -1,11 +1,12 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+
 # todo : check all of the max_length
 class TokenValidationForm(forms.Form):
-    token = forms.CharField(required=True,max_length=500)
+    token = forms.CharField(required=True, max_length=500)
     # 1 for true , 0 for false
-    email = forms.CharField(required=True,max_length=1)
+    email = forms.CharField(required=True, max_length=1)
 
     def clean(self):
         if 'email' in self.cleaned_data:
@@ -14,13 +15,15 @@ class TokenValidationForm(forms.Form):
             else:
                 raise forms.ValidationError(_('Invalid parameter'))
 
+
 class DeviceKeyValidationForm(forms.Form):
-    device_key = forms.CharField(required=True,max_length=500)
+    device_key = forms.CharField(required=True, max_length=500)
     # r for read key, w for write key
-    key_type = forms.CharField(required=True,max_length=1)
+    key_type = forms.CharField(required=True, max_length=1)
+
 
 class DeviceKeyRefreshForm(forms.Form):
-    device_uuid = forms.CharField(required=True,max_length=500)
+    device_uuid = forms.CharField(required=True, max_length=500)
 
 
 class ChangePasswordForm(forms.Form):

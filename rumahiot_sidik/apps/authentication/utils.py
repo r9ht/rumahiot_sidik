@@ -1,13 +1,15 @@
-import hashlib,requests,os
+import hashlib
+import os
+import requests
 
 
-class SidikUtils():
+class SidikUtils:
     # return : salt(string),hashed_password(string)
     # salt will be used as uuid in the user table
-    def password_hasher(self,salt, password):
+    def password_hasher(self, salt, password):
         return hashlib.sha512(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
 
-    def recaptcha_verify(self,captcha_response):
+    def recaptcha_verify(self, captcha_response):
         # dont forget to put the secret in environment instead
         # return value recaptcha response : boolean
 
@@ -56,6 +58,7 @@ class ResponseGenerator():
         }
         return response
 
+
 class RequestUtils():
     # get access token from authorization header
     # input parameter : request(request)
@@ -85,4 +88,3 @@ class RequestUtils():
                 data['token'] = auth_header[1]
                 data['error'] = None
                 return data
-

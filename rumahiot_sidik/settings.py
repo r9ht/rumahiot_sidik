@@ -15,17 +15,15 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SIDIK_SECRET_KEY','')
+SECRET_KEY = os.environ.get('SIDIK_SECRET_KEY', '')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -71,7 +69,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rumahiot_sidik.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -101,7 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -115,23 +111,22 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
 
-
 # TODO : Generate new key every day for SURAT API
 
 # RUMAH IOT SIDIK CONFIG
-DEFAULT_PROFILE_IMAGE_URL = os.environ.get('DEFAULT_PROFILE_IMAGE_URL','')
-RUMAHIOT_USERS_TABLE = os.environ.get('RUMAHIOT_USERS_TABLE','')
-RUMAHIOT_USERS_PROFILE_TABLE = os.environ.get('RUMAHIOT_USERS_PROFILE_TABLE','')
-RUMAHIOT_REGION = os.environ.get('RUMAHIOT_REGION','')
-RUMAHIOT_SURAT_API_KEY = os.environ.get('RUMAHIOT_SURAT_API_KEY','')
-RUMAHIOT_SURAT_SEND_EMAIL_ACTIVATION_ENDPOINT = os.environ.get('RUMAHIOT_SURAT_SEND_EMAIL_ACTIVATION_ENDPOINT','')
-RUMAHIOT_SURAT_SEND_WELCOME_EMAIL_ENDPOINT = os.environ.get('RUMAHIOT_SURAT_SEND_WELCOME_EMAIL_ENDPOINT','')
+DEFAULT_PROFILE_IMAGE_URL = os.environ.get('DEFAULT_PROFILE_IMAGE_URL', '')
+RUMAHIOT_USERS_TABLE = os.environ.get('RUMAHIOT_USERS_TABLE', '')
+RUMAHIOT_USERS_PROFILE_TABLE = os.environ.get('RUMAHIOT_USERS_PROFILE_TABLE', '')
+RUMAHIOT_REGION = os.environ.get('RUMAHIOT_REGION', '')
+RUMAHIOT_SURAT_API_KEY = os.environ.get('RUMAHIOT_SURAT_API_KEY', '')
+RUMAHIOT_SURAT_SEND_EMAIL_ACTIVATION_ENDPOINT = os.environ.get('RUMAHIOT_SURAT_SEND_EMAIL_ACTIVATION_ENDPOINT', '')
+RUMAHIOT_SURAT_SEND_WELCOME_EMAIL_ENDPOINT = os.environ.get('RUMAHIOT_SURAT_SEND_WELCOME_EMAIL_ENDPOINT', '')
+RUMAHIOT_SIDIK_API_KEY = os.environ.get('RUMAHIOT_SIDIK_API_KEY', '')
 # TODO :  GENERATE NEW KEY FOR JWT SIGNING EVERY ONE HOUR
 
 # CORS Header

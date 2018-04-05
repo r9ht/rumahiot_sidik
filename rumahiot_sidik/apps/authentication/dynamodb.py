@@ -1,11 +1,15 @@
-import boto3
-from uuid import uuid4
-from rumahiot_sidik.apps.authentication.utils import SidikUtils
-from boto3.dynamodb.conditions import Key
-from rumahiot_sidik.settings import RUMAHIOT_USERS_TABLE,RUMAHIOT_REGION,RUMAHIOT_USERS_PROFILE_TABLE,DEFAULT_PROFILE_IMAGE_URL
 from datetime import datetime
+from uuid import uuid4
 
-class SidikDynamoDB():
+import boto3
+from boto3.dynamodb.conditions import Key
+
+from rumahiot_sidik.apps.authentication.utils import SidikUtils
+from rumahiot_sidik.settings import RUMAHIOT_USERS_TABLE, RUMAHIOT_REGION, RUMAHIOT_USERS_PROFILE_TABLE, \
+    DEFAULT_PROFILE_IMAGE_URL
+
+
+class SidikDynamoDB:
 
     # initiate the client
     def __init__(self):
@@ -14,7 +18,7 @@ class SidikDynamoDB():
     # get user account by email
     # input parameter : email(string)
     # return user [dict]
-    def get_user_by_email(self,email):
+    def get_user_by_email(self, email):
         table = self.client.Table(RUMAHIOT_USERS_TABLE)
         # get user account
         response = table.scan(
@@ -27,7 +31,7 @@ class SidikDynamoDB():
     # get user account by user_uuid
     # input parameter : user_uuid(string)
     # return user [dict]
-    def get_user_by_user_uuid(self,user_uuid):
+    def get_user_by_user_uuid(self, user_uuid):
         table = self.client.Table(RUMAHIOT_USERS_TABLE)
         # get user account
         response = table.scan(
@@ -54,7 +58,7 @@ class SidikDynamoDB():
     # input parameter : email(string) , password(string)
     # return : is_valid(boolean) , data(dict) , error_message(string)
     # todo : add last login
-    def check_user(self,email, password):
+    def check_user(self, email, password):
         data = {}
         user = self.get_user_by_email(email)
         if len(user) != 1:
@@ -87,7 +91,7 @@ class SidikDynamoDB():
     # input parameter : email(string) , password(string), activation_uuid(string)
     # return : status(boolean)
     # todo check aws timezone
-    def create_user_by_email(self,full_name, email, password, activation_uuid):
+    def create_user_by_email(self, full_name, email, password, activation_uuid):
         utils = SidikUtils()
         status = False
         # for password salt
@@ -157,8 +161,7 @@ class SidikDynamoDB():
             UpdateExpression="set salt=:s, password=:p",
             ExpressionAttributeValues={
                 ':s': new_salt,
-                ':p': utils.password_hasher(salt=new_salt,password=new_password)
+                ':p': utils.password_hasher(salt=new_salt, password=new_password)
             },
             ReturnValues="UPDATED_NEW"
         )
-
