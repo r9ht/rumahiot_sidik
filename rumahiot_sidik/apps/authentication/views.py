@@ -51,12 +51,11 @@ def email_authentication(request):
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
 
                 else:
-                    response_data = rg.error_response_generator(400, user["error_message"])
-                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
+                    response_data = rg.error_response_generator(401, user["error_message"])
+                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
         else:
             response_data = rg.error_response_generator(400, 'invalid or missing parameter submitted')
             return HttpResponse(json.dumps(response_data), content_type='application/json', status=400)
-
 
 @csrf_exempt
 def email_registration(request):
@@ -121,7 +120,6 @@ def email_registration(request):
                 response_data = rg.error_response_generator(400, "Missmatch password or invalid parameter submitted")
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
 
-
 # Get user email using user_uuid
 # This resource only available to authenticated service
 # Only accessable using SIDIK_API_KEY as authorization header
@@ -140,8 +138,8 @@ def get_user_email(request):
             # API Key will be called token in this context
             token = requtils.get_access_token(request)
         except KeyError:
-            response_data = rg.error_response_generator(400, "Please define the authorization header")
-            return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
+            response_data = rg.error_response_generator(403, "Please define the authorization header")
+            return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
         else:
             if token['token'] is not None:
                 form = GetUserEmailForm(request.POST)
@@ -167,9 +165,8 @@ def get_user_email(request):
                         response_data = rg.error_response_generator(400, 'invalid or missing parameter submitted')
                         return HttpResponse(json.dumps(response_data), content_type='application/json', status=400)
             else:
-                response_data = rg.error_response_generator(400, token['error'])
-                return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
-
+                response_data = rg.error_response_generator(403, token['error'])
+                return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
     else:
         response_data = rg.error_response_generator(400, "Bad request method")
         return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
