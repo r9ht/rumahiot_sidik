@@ -36,8 +36,8 @@ def token_validation(request):
                 # try to get the payload
                 result = jwt.token_validator(form.cleaned_data['token'])
                 if result['error'] != None:
-                    response_data = rg.error_response_generator(403, result['error'])
-                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
+                    response_data = rg.error_response_generator(401, result['error'])
+                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
                 else:
 
                     # If email address requested
@@ -113,8 +113,8 @@ def change_password(request):
         try:
             token = requtils.get_access_token(request)
         except KeyError:
-            response_data = rg.error_response_generator(403, "Please define the authorization header")
-            return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
+            response_data = rg.error_response_generator(401, "Please define the authorization header")
+            return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
         else:
             if token['token'] is not None:
                 data = jwt.token_validator(token['token'])
@@ -157,11 +157,11 @@ def change_password(request):
                                                                     "Missmatch password or invalid parameter submitted")
                         return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
                 else:
-                    response_data = rg.error_response_generator(403, data['error'])
-                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
+                    response_data = rg.error_response_generator(401, data['error'])
+                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
             else:
-                response_data = rg.error_response_generator(403, token['error'])
-                return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
+                response_data = rg.error_response_generator(401, token['error'])
+                return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
 
     else:
         response_data = rg.error_response_generator(400, "Bad request method")

@@ -32,19 +32,19 @@ class SidikJWT:
             payload = jwt.decode(token, os.environ.get('SIDIK_SECRET_KEY', ''), algorithm='HS256')
         except NotImplementedError:
             data['payload'] = None
-            data['error'] = 'Invalid JWT structure'
+            data['error'] = 'Invalid JWT structure, please reauthenticate'
             return data
         except exceptions.DecodeError:
             data['payload'] = None
-            data['error'] = 'Invalid JWT signature'
+            data['error'] = 'Invalid JWT signature, please reauthenticate'
             return data
         except exceptions.InvalidAlgorithmError:
             data['payload'] = None
-            data['error'] = 'Invalid JWT algorithm spesified'
+            data['error'] = 'Invalid JWT algorithm spesified, please reauthenticate'
             return data
         except exceptions.ExpiredSignatureError:
             data['payload'] = None
-            data['error'] = 'Token expired'
+            data['error'] = 'Token expired, Please reauthenticate'
             return data
         else:
             data['payload'] = payload

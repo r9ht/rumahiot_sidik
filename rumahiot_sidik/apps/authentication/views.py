@@ -138,8 +138,8 @@ def get_user_email(request):
             # API Key will be called token in this context
             token = requtils.get_access_token(request)
         except KeyError:
-            response_data = rg.error_response_generator(403, "Please define the authorization header")
-            return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
+            response_data = rg.error_response_generator(401, "Please define the authorization header")
+            return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
         else:
             if token['token'] is not None:
                 form = GetUserEmailForm(request.POST)
@@ -165,8 +165,8 @@ def get_user_email(request):
                         response_data = rg.error_response_generator(400, 'invalid or missing parameter submitted')
                         return HttpResponse(json.dumps(response_data), content_type='application/json', status=400)
             else:
-                response_data = rg.error_response_generator(403, token['error'])
-                return HttpResponse(json.dumps(response_data), content_type="application/json", status=403)
+                response_data = rg.error_response_generator(401, token['error'])
+                return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
     else:
         response_data = rg.error_response_generator(400, "Bad request method")
         return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)

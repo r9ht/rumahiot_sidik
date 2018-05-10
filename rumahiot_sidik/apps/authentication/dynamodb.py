@@ -65,7 +65,7 @@ class SidikDynamoDB:
             # If returned data isnt normal (more than 1 email) -> shouldn't happen though
             data['is_valid'] = False
             data['user'] = None
-            data['error_message'] = "Invalid email or password"
+            data['error_message'] = "There was an error with your E-Mail/Password combination"
             return data
 
         else:
@@ -74,12 +74,12 @@ class SidikDynamoDB:
                 # if the password wasn't correct
                 data['is_valid'] = False
                 data['user'] = None
-                data['error_message'] = "Invalid email or password"
+                data['error_message'] = "There was an error with your E-Mail/Password combination"
                 return data
             elif user[0]['activated'] != True:
                 data['is_valid'] = False
                 data['user'] = None
-                data['error_message'] = "Please activate your account"
+                data['error_message'] = "Please activate your account before logging in"
                 return data
             else:
                 data['is_valid'] = True
