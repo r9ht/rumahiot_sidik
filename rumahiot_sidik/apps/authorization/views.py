@@ -7,7 +7,7 @@ from rumahiot_sidik.apps.authentication.dynamodb import SidikDynamoDB
 from rumahiot_sidik.apps.authentication.jwt import SidikJWT
 from rumahiot_sidik.apps.authentication.utils import SidikUtils, ResponseGenerator, RequestUtils
 from rumahiot_sidik.apps.authorization.forms import TokenValidationForm, ChangePasswordForm
-from rumahiot_sidik.apps.surat_modules.send_email import SidikSuratModule
+from rumahiot_sidik.apps.surat_modules.send_email import send_activation_email, send_welcome_email
 
 
 # Create your views here.
@@ -60,7 +60,6 @@ def email_activation(request, activation_uuid):
     # Sidik classes
     rg = ResponseGenerator()
     db = SidikDynamoDB()
-    sm = SidikSuratModule()
 
     if request.method == 'GET':
         user = db.get_user_by_activation_uuid(activation_uuid=activation_uuid)
@@ -74,18 +73,9 @@ def email_activation(request, activation_uuid):
                     return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
                 else:
                     # Send welcome email
-                    response = sm.send_welcome_email(user[0]['email'])
-                    if response.status_code == 200:
-                        response_data = rg.success_response_generator(200,
-                                                                      "Your account has been activated")
-                        return HttpResponse(json.dumps(response_data), content_type="application/json",
-                                            status=200)
-                    else:
-                        # unknown client error
-                        response_data = rg.error_response_generator(500, "Internal server error")
-                        return HttpResponse(json.dumps(response_data), content_type="application/json",
-                                            status=500)
-
+                    send_welcome_email(user[0]['email'])
+                    response_data = rg.success_response_generator(200, "Your account has been activated")
+                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
 
             else:
                 # account already activated
