@@ -6,6 +6,6 @@
     "project_name": "rumahiot-sidik",
     "runtime": "python3.6",
     "s3_bucket": "zappa-t15kbmjq9",
-    "timeout_seconds": 300
+    "timeout_seconds": 140
   }
 }

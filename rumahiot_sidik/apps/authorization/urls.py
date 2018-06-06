@@ -16,12 +16,14 @@ Including another URLconf
 # from django.contrib import admin
 from django.conf.urls import url
 
-from rumahiot_sidik.apps.authorization.views import token_validation, email_activation, change_password
+from rumahiot_sidik.apps.authorization.views import token_validation, email_activation, change_password, forgot_password, confirm_forgot_password
 
 urlpatterns = [
     url(r'^token/validate$', token_validation, name='token_validation'),
     url(r'^email/activate/(?P<activation_uuid>.+)$', email_activation, name='email_activation'),
     url(r'^password/change$', change_password, name='change_password'),
+    url(r'^password/forgot$', forgot_password, name='forgot_password'),
+    url(r'^password/forgot/confirm/$', confirm_forgot_password, name='confirm_forgot_password'),
 
 
 ]

@@ -4,14 +4,13 @@ from django.utils.translation import ugettext_lazy as _
 
 class EmailLoginForm(forms.Form):
     email = forms.EmailField(required=True, max_length=254)
-    password = forms.CharField(required=True, max_length=128)
-
+    password = forms.CharField(required=True, max_length=50)
 
 class EmailRegistrationForm(forms.Form):
     full_name = forms.CharField(required=True, max_length=70)
     email = forms.EmailField(required=True, max_length=254)
-    password = forms.CharField(required=True, max_length=128)
-    retype_password = forms.CharField(required=True, max_length=128)
+    password = forms.CharField(required=True, max_length=50)
+    retype_password = forms.CharField(required=True, max_length=50)
 
     def clean(self):
         if 'password' in self.cleaned_data and 'retype_password' in self.cleaned_data and 'full_name' in self.cleaned_data:

@@ -27,9 +27,9 @@ class DeviceKeyRefreshForm(forms.Form):
 
 
 class ChangePasswordForm(forms.Form):
-    old_password = forms.CharField(required=True, max_length=128)
-    new_password = forms.CharField(required=True, max_length=128)
-    new_password_retype = forms.CharField(required=True, max_length=128)
+    old_password = forms.CharField(required=True, max_length=50)
+    new_password = forms.CharField(required=True, max_length=50)
+    new_password_retype = forms.CharField(required=True, max_length=50)
 
     def clean(self):
         if 'new_password' in self.cleaned_data and 'new_password_retype' in self.cleaned_data:
@@ -37,3 +37,18 @@ class ChangePasswordForm(forms.Form):
                 raise forms.ValidationError(_('Password missmatch'))
             else:
                 return self.cleaned_data
+
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField(required=True, max_length=254)
+
+class ConfirmForgotPasswordForm(forms.Form):
+    forgot_password_uuid = forms.CharField(required=True, max_length=32)
+    new_password = forms.CharField(required=True, max_length=50)
+    new_password_retype = forms.CharField(required=True, max_length=50)
+
+    def clean(self):
+        if 'new_password' in self.cleaned_data and 'new_password_retype' in self.cleaned_data:
+            if(self.cleaned_data['new_password'] == self.cleaned_data['new_password_retype']):
+                return self.cleaned_data
+            else:
+                raise forms.ValidationError(_('Password missmatch'))

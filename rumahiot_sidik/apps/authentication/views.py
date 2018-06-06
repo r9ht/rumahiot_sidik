@@ -93,7 +93,7 @@ def email_registration(request):
                     else:
                         if create_success:
                             # Send confirmation email
-                            send_activation_email(email=form.cleaned_data['email'],activation_uuid=activation_uuid)
+                            send_activation_email(email=form.cleaned_data['email'],activation_uuid=activation_uuid, full_name= form.cleaned_data['full_name'])
                             response_data = rg.success_response_generator(200, "Successfully registered please check your email for confirmation")
                             return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
                         else:
@@ -119,7 +119,6 @@ def get_user_email(request):
     db = SidikDynamoDB()
     utils = SidikUtils()
     rg = ResponseGenerator()
-    sm = SidikSuratModule()
     requtils = RequestUtils()
 
     if request.method == 'POST' :
