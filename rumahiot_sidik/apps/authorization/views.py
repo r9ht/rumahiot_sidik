@@ -155,37 +155,43 @@ def forgot_password(request):
     # Sidik classes
     rg = ResponseGenerator()
     db = SidikDynamoDB()
+    utils = SidikUtils()
 
     if request.method == "POST":
         form = ForgotPasswordForm(request.POST)
-        if form.is_valid() :
-            # Check the mail
-            user = db.get_user_by_email(email=form.cleaned_data['email'])
-            if len(user) != 0:
-                forgot_password_uuid = uuid4().hex
-                # Invalidate existing forgor password request
-                forgot_requests = db.get_user_forgot_password_request(user_uuid=user[0]['user_uuid'])
-                for forgot_request in forgot_requests :
-                    db.invalidate_forgot_password_request(forgot_request['forgot_password_uuid'])
-                # Put new request
-                try :
-                    db.create_forgot_password_request(user_uuid=user[0]['user_uuid'], forgot_password_uuid=forgot_password_uuid)
-                except :
-                    # unknown client error
-                    response_data = rg.error_response_generator(500, "Internal server error")
-                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
+        if(utils.recaptcha_verify(request.POST.get("g-recaptcha-response", ""))) :
+            if form.is_valid():
+                # Check the mail
+                user = db.get_user_by_email(email=form.cleaned_data['email'])
+                if len(user) != 0:
+                    forgot_password_uuid = uuid4().hex
+                    # Invalidate existing forgor password request
+                    forgot_requests = db.get_user_forgot_password_request(user_uuid=user[0]['user_uuid'])
+                    for forgot_request in forgot_requests:
+                        db.invalidate_forgot_password_request(forgot_request['forgot_password_uuid'])
+                    # Put new request
+                    try:
+                        db.create_forgot_password_request(user_uuid=user[0]['user_uuid'], forgot_password_uuid=forgot_password_uuid)
+                    except:
+                        # unknown client error
+                        response_data = rg.error_response_generator(500, "Internal server error")
+                        return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
+                    else:
+                        # Get user profile
+                        profile = db.get_user_profile_data(user_uuid=user[0]['user_uuid'])
+                        # Send the email
+                        send_forgot_password_email(email=user[0]['email'], forgot_password_uuid=forgot_password_uuid, full_name=profile[0]['full_name'])
+                        response_data = rg.success_response_generator(200, "If a RumahIoT account exists for {}, an e-mail will be sent with further instructions.".format(form.cleaned_data['email']))
+                        return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
                 else:
-                    # Get user profile
-                    profile = db.get_user_profile_data(user_uuid=user[0]['user_uuid'])
-                    # Send the email
-                    send_forgot_password_email(email=user[0]['email'], forgot_password_uuid=forgot_password_uuid, full_name=profile[0]['full_name'])
                     response_data = rg.success_response_generator(200, "If a RumahIoT account exists for {}, an e-mail will be sent with further instructions.".format(form.cleaned_data['email']))
                     return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
             else:
-                response_data = rg.success_response_generator(200, "If a RumahIoT account exists for {}, an e-mail will be sent with further instructions.".format(form.cleaned_data['email']))
-                return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+                response_data = rg.error_response_generator(400, "Invalid or missing parameter submitted")
+                return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
         else:
-            response_data = rg.error_response_generator(400, "Invalid or missing parameter submitted")
+            # if the recaptcha isn't valid
+            response_data = rg.error_response_generator(400, "Please complete the Recaptcha")
             return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
     else:
         response_data = rg.error_response_generator(400, 'Invalid request method')

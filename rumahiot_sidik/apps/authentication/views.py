@@ -71,15 +71,14 @@ def email_registration(request):
         # TODO : Generate error response for rumah iot & error response api for rumah IoT
         try:
             form = EmailRegistrationForm(request.POST)
-        # Todo : Put key checking in the dorm , and remove this thing
+        # Todo : Put key checking in the form , and remove this thing
         except KeyError:
             response_data = rg.error_response_generator(500, "Internal server error")
             return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
         else:
             # is_recaptcha_valid = utils.recaptcha_verify(request.POST.get("g_recaptcha_response", "")) g-recaptcha-response
-            is_recaptcha_valid = utils.recaptcha_verify(request.POST.get("g-recaptcha-response", ""))
             if form.is_valid():
-                if is_recaptcha_valid:
+                if (utils.recaptcha_verify(request.POST.get("g-recaptcha-response", ""))):
                     activation_uuid = uuid4().hex
                     try:
                         create_success = db.create_user_by_email(full_name=form.cleaned_data['full_name'],
