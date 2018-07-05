@@ -15,6 +15,43 @@ from rumahiot_sidik.apps.authentication.decorator import get_method_required, po
 
 # Create your views here.
 
+# admin authenticate using email address and password
+@csrf_exempt
+@post_method_required
+def admin_email_authentication(request):
+    # Sidik classes
+    db = SidikDynamoDB()
+    rg = ResponseGenerator()
+    sidik_jwt = SidikJWT()
+
+    form = EmailLoginForm(request.POST)
+    if form.is_valid():
+        try:
+            # check user email and password
+            user = db.check_admin(form.cleaned_data['email'], form.cleaned_data['password'])
+        except ImportError:
+            response_data = rg.error_response_generator(500, "Internal server error")
+            return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
+        else:
+            # if the account is valid
+            if user['is_valid']:
+                try:
+                    # create the token
+                    data = {
+                        "token": sidik_jwt.admin_token_generator(user['user']['user_uuid'])
+                    }
+                except:
+                    response_data = rg.error_response_generator(500, "Internal server error")
+                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
+                else:
+                    response_data = rg.data_response_generator(data)
+                    return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+
+            else:
+                response_data = rg.error_response_generator(1, user["error_message"])
+                return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
+
+
 # authenticate using email address and password
 # todo : implement refresh token
 @csrf_exempt

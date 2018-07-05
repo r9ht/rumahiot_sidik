@@ -16,6 +16,44 @@ from rumahiot_sidik.apps.authentication.decorator import get_method_required, po
 # Create your views here.
 # Todo : Protect this endpoint with key
 
+# Validate admin token
+@csrf_exempt
+@post_method_required
+def admin_token_validation(request):
+
+    # Sidik classes
+    jwt = SidikJWT()
+    rg = ResponseGenerator()
+    db = SidikDynamoDB()
+
+    try:
+        form = TokenValidationForm(request.POST)
+    except KeyError:
+        response_data = rg.error_response_generator(500, "Internal server error")
+        return HttpResponse(json.dumps(response_data), content_type="application/json", status=500)
+    else:
+        if form.is_valid():
+            # try to get the payload
+            result = jwt.admin_token_validator(form.cleaned_data['token'])
+            if result['error'] != None:
+                response_data = rg.error_response_generator(401, result['error'])
+                return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
+            else:
+                # If email address requested
+                if form.cleaned_data['email'] == "1":
+                    user = db.get_user_by_user_uuid(result['payload']['user_uuid'])
+                    result['payload']['email'] = user[0]['email']
+                data = {
+                    'token': form.cleaned_data['token'],
+                    'payload': result['payload']
+                }
+                response_data = rg.data_response_generator(data)
+                return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+
+        else:
+            response_data = rg.error_response_generator(400, "invalid or missing parameter submitted")
+            return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
+
 # Validate token that sent , returning user_uuid and other data based on the request
 @csrf_exempt
 @post_method_required

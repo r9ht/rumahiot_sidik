@@ -103,6 +103,52 @@ class SidikDynamoDB:
             }
         )
 
+    # admin email authentication
+    # input parameter : email(string) , password(string)
+    # return : is_valid(boolean) , data(dict) , error_message(string)
+    # todo : add last login
+    def check_admin(self, email, password):
+        data = {}
+        user = self.get_user_by_email(email)
+        if len(user) != 1:
+            # If returned data isnt normal (more than 1 email) -> shouldn't happen though
+            data['is_valid'] = False
+            data['user'] = None
+            data['error_message'] = "There was an error with your E-Mail/Password combination"
+            return data
+
+        else:
+            utils = SidikUtils()
+            if user[0]['password'] != utils.password_hasher(user[0]['salt'], password):
+                # if the password wasn't correct
+                data['is_valid'] = False
+                data['user'] = None
+                data['error_message'] = "There was an error with your E-Mail/Password combination"
+                return data
+            elif user[0]['activated'] != True:
+                data['is_valid'] = False
+                data['user'] = None
+                data['error_message'] = "Please activate your account before logging in"
+                return data
+            else:
+                if 'admin' in user[0]:
+                    if (user[0]['admin']) :
+                        data['is_valid'] = True
+                        data['user'] = user[0]
+                        data['error_message'] = None
+                        return data
+                    else:
+                        data['is_valid'] = False
+                        data['user'] = None
+                        data['error_message'] = 'Invalid account used'
+                        return data
+                else:
+                    data['is_valid'] = False
+                    data['user'] = None
+                    data['error_message'] = 'Invalid account used'
+                    return data
+
+
     # email authentication
     # input parameter : email(string) , password(string)
     # return : is_valid(boolean) , data(dict) , error_message(string)
