@@ -32,6 +32,14 @@ class SidikDynamoDB:
         # return [uuid(string), email(string), password(string), last_login (string) -> utc timestamp] or [] if theres not match
         return response['Items']
 
+    # Get all user
+    def get_all_user(self):
+        table = self.client.Table(RUMAHIOT_USERS_TABLE)
+        # get user account
+        response = table.scan()
+        # return [uuid(string), email(string), password(string), last_login (string) -> utc timestamp] or [] if theres not match
+        return response['Items']
+
     # get user account by user_uuid
     # input parameter : user_uuid(string)
     # return user [dict]
@@ -91,6 +99,21 @@ class SidikDynamoDB:
             ReturnValues="UPDATED_NEW"
         )
 
+    # Change user account data (activation and admin status)
+    def update_account_data(self, user_uuid, activated, admin):
+        table = self.client.Table(RUMAHIOT_USERS_TABLE)
+        response = table.update_item(
+            Key={
+                'user_uuid': user_uuid
+            },
+            UpdateExpression="set activated=:ac, admin=:ad",
+            ExpressionAttributeValues={
+                ':ac': activated,
+                ':ad': admin
+            },
+            ReturnValues="UPDATED_NEW"
+        )
+
     # Create forgot password request
     def create_forgot_password_request(self, user_uuid, forgot_password_uuid):
         table = self.client.Table(RUMAHIOT_FORGOT_PASSWORD_TABLE)
@@ -140,12 +163,12 @@ class SidikDynamoDB:
                     else:
                         data['is_valid'] = False
                         data['user'] = None
-                        data['error_message'] = 'Invalid account used'
+                        data['error_message'] = 'Your admin account is not valid'
                         return data
                 else:
                     data['is_valid'] = False
                     data['user'] = None
-                    data['error_message'] = 'Invalid account used'
+                    data['error_message'] = 'Your admin account is not valid'
                     return data
 
 
@@ -211,7 +234,8 @@ class SidikDynamoDB:
                     'salt': salt,
                     'activation_uuid': activation_uuid,
                     'activated': False,
-                    'time_created': str(datetime.now().timestamp())
+                    'time_created': str(datetime.now().timestamp()),
+                    'admin': False
                 }
             )
 

@@ -16,11 +16,13 @@ Including another URLconf
 # from django.contrib import admin
 from django.conf.urls import url
 
-from rumahiot_sidik.apps.authentication.views import email_authentication, email_registration, get_user_email, admin_email_authentication
+from rumahiot_sidik.apps.authentication.views import email_authentication, email_registration, get_user_email, admin_email_authentication, get_user_list, update_user_account
 
 urlpatterns = [
     url(r'^email$', email_authentication, name='email_authentication'),
     url(r'^admin/email$', admin_email_authentication, name='admin_email_authentication'),
+    url(r'^user/list$', get_user_list, name='get_user_list'),
+    url(r'^user/update', update_user_account, name='update_user_account'),
     url(r'^email/register$', email_registration, name='email_registration'),
     # This url resource can be accessed by authorized service only (With API Key)
     # Get user email address from user_uuid

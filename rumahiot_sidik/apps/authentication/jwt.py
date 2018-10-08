@@ -70,12 +70,12 @@ class SidikJWT:
                     return data
                 else:
                     data['payload'] = None
-                    data['error'] = 'Invalid account used'
+                    data['error'] = 'Your admin account is not valid'
                     return data
 
             else:
                 data['payload'] = None
-                data['error'] = 'Invalid account used'
+                data['error'] = 'Your admin account is not valid'
                 return data
 
 

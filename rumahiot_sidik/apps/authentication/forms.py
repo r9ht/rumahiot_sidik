@@ -33,3 +33,21 @@ class TokenValidationForm(forms.Form):
 
 class GetUserEmailForm(forms.Form):
     user_uuid = forms.CharField(required=True, max_length=200)
+
+class UpdateUserAccountForm(forms.Form):
+    #Accepted input
+    ACCEPTED_INPUT = ['0', '1']
+
+    user_uuid = forms.CharField(required=True, max_length=200)
+    activated = forms.CharField(max_length=1)
+    admin = forms.CharField(max_length=1)
+
+    # Clean the input
+    def clean(self):
+        if ('activated' in self.cleaned_data) and ('admin' in self.cleaned_data):
+            if (self.cleaned_data['activated'] in self.ACCEPTED_INPUT) and (self.cleaned_data['admin'] in self.ACCEPTED_INPUT):
+                return self.cleaned_data
+            else:
+                raise forms.ValidationError(_('Invalid parameter'))
+        else:
+            raise forms.ValidationError(_('Invalid parameter'))

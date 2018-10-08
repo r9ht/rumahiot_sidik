@@ -5,15 +5,83 @@ from django.shortcuts import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from rumahiot_sidik.apps.authentication.dynamodb import SidikDynamoDB
-from rumahiot_sidik.apps.authentication.forms import EmailLoginForm, EmailRegistrationForm, GetUserEmailForm
+from rumahiot_sidik.apps.authentication.forms import EmailLoginForm, EmailRegistrationForm, GetUserEmailForm, UpdateUserAccountForm
 from rumahiot_sidik.apps.authentication.jwt import SidikJWT
 from rumahiot_sidik.apps.authentication.utils import SidikUtils, ResponseGenerator, RequestUtils
 from rumahiot_sidik.apps.surat_modules.send_email import send_welcome_email, send_activation_email
 from rumahiot_sidik.settings import RUMAHIOT_SIDIK_API_KEY
 
-from rumahiot_sidik.apps.authentication.decorator import get_method_required, post_method_required
+from rumahiot_sidik.apps.authentication.decorator import get_method_required, post_method_required, admin_authentication_required
 
 # Create your views here.
+
+# Get user list
+@get_method_required
+@admin_authentication_required
+def get_user_list(request):
+    # Sidik classes
+    db = SidikDynamoDB()
+    rg = ResponseGenerator()
+
+    # Get all user
+    users = db.get_all_user()
+    user_payload = {
+        'users': [],
+        'user_count': len(users)
+    }
+    for user in users:
+        # Change the boolean type for admin and activated
+        activated = '0'
+        admin = '0'
+        if user['activated']:
+            activated = '1'
+        if user['admin']:
+            admin ='1'
+
+        user = {
+            'user_uuid': user['user_uuid'],
+            'email': user['email'],
+            'activated': activated,
+            'admin': admin,
+            'time_created': user['time_created'],
+        }
+        user_payload['users'].append(user)
+    response_data = rg.data_response_generator(user_payload)
+    return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+
+@csrf_exempt
+@post_method_required
+@admin_authentication_required
+def update_user_account(request):
+    # Sidik classes
+    db = SidikDynamoDB()
+    rg = ResponseGenerator()
+
+    form = UpdateUserAccountForm(request.POST)
+    if form.is_valid():
+        user = db.get_user_by_user_uuid(user_uuid=form.cleaned_data['user_uuid'])
+        if len(user) == 1:
+            # Normalize the data
+            activated = False
+            admin = False
+
+            if form.cleaned_data['admin'] == "1":
+                admin = True
+            if form.cleaned_data['activated'] == "1":
+                activated = True
+
+            # Update user account
+            db.update_account_data(user_uuid=form.cleaned_data['user_uuid'], activated=activated, admin=admin)
+            response_data = rg.success_response_generator(200, "User account successfully updated")
+            return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+
+        else:
+            response_data = rg.error_response_generator(400, "Invalid user uuid")
+            return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
+    else:
+        response_data = rg.error_response_generator(400, "Please fill the form correctly")
+        return HttpResponse(json.dumps(response_data), content_type="application/json", status=400)
+
 
 # admin authenticate using email address and password
 @csrf_exempt
@@ -48,9 +116,11 @@ def admin_email_authentication(request):
                     return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
 
             else:
-                response_data = rg.error_response_generator(1, user["error_message"])
+                response_data = rg.error_response_generator(2, user["error_message"])
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
-
+    else:
+        response_data = rg.error_response_generator(1, "Please fill the form correctly")
+        return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
 
 # authenticate using email address and password
 # todo : implement refresh token
@@ -89,6 +159,9 @@ def email_authentication(request):
             else:
                 response_data = rg.error_response_generator(1, user["error_message"])
                 return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
+    else:
+        response_data = rg.error_response_generator(1, "Please fill the form correctly")
+        return HttpResponse(json.dumps(response_data), content_type="application/json", status=401)
 
 @csrf_exempt
 @post_method_required
